@@ -18,7 +18,7 @@
  * @property Support $support
  * @property User[] $users
  */
-class Address extends CActiveRecord
+class MyAddress extends CActiveRecord
 {
     
         public $province;
