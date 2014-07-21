@@ -1,3 +1,5 @@
 phpunit.phar
 *.swp
 
+
+/vendor/

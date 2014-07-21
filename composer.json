@@ -1,0 +1,13 @@
+{
+    "name": "wifimore/db_accessor",
+    "description": "A specifically tailored db accessor, not for general purpose",
+    "require": {
+        "yiisoft/yii": "1.1.*"
+    },
+    "authors": [
+        {
+            "name": "Dev Team",
+            "email": "dev@wifimore.cn"
+        }
+    ]
+}
