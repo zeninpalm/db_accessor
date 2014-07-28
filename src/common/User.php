@@ -145,7 +145,7 @@ class User extends CActiveRecord
         }
     }
 
-    private function isRepeat($attr, $value, $msg)
+    protected  function isRepeat($attr, $value, $msg)
     {
         if (count($this->getErrors($attr)) == 0) {
             $item = User::model()->findByAttributes(array($attr => $value));
