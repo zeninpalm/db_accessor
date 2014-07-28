@@ -1,8 +1,14 @@
 {
     "name": "wifimore/db_accessor",
+    "version": "0.3",
     "description": "A specifically tailored db accessor, not for general purpose",
     "require": {
         "yiisoft/yii": "1.1.*"
+    },
+    "autoload": {
+      "psr-0": {
+        "" : "src"
+      }
     },
     "authors": [
         {

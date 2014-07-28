@@ -7,15 +7,15 @@
  */
 require_once __DIR__ . '/../common/User.php';
 
+
+/**
+ * This is the model class for table "user".
+ *
+ * The followings are the available columns in table 'user':
+ * @property string $create_time
+ */
 class AdUser extends User
 {
-
-    /**
-     * This is the model class for table "user".
-     *
-     * The followings are the available columns in table 'user':
-     * @property string $create_time
-     */
 
     /**
      * @return array customized attribute labels (name=>label)
@@ -88,8 +88,6 @@ class AdUser extends User
      */
     public function search()
     {
-        // @todo Please modify the following code to remove attributes that should not be searched.
-
         $criteria=new CDbCriteria;
 
         $criteria->compare('id',$this->id,true);

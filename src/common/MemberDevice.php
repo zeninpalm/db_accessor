@@ -80,36 +80,6 @@ class MemberDevice extends CActiveRecord
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('member_id',$this->member_id,true);
-		$criteria->compare('mobile',$this->mobile,true);
-		$criteria->compare('mac',$this->mac,true);
-		$criteria->compare('brand',$this->brand,true);
-		$criteria->compare('model',$this->model,true);
-		$criteria->compare('create_time',$this->create_time);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -136,11 +106,11 @@ class MemberDevice extends CActiveRecord
                 $find->mac = $connectionUser->mac;
                 $find->save();
             }
-            if($connectionUser->router!=null && $connectionUser->router->company_id>0){
-                $cmember = CompanyMember::findMember($connectionUser->router->company_id,$member->id);
+            if($connectionUser->company!=null && $connectionUser->company_id>0){
+                $cmember = CompanyMember::findMember($connectionUser->company_id,$member->id);
                 if($cmember==null){
                     $cmember = new CompanyMember;
-                    $cmember->company_id = $connectionUser->router->company_id;
+                    $cmember->company_id = $connectionUser->company_id;
                     $cmember->member_id = $member->id;
                     $cmember->mobile = $connectionUser->mobile;
                 }else{
