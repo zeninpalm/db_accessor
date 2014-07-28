@@ -19,7 +19,7 @@ require_once __DIR__ . '/../common/User.php';
  * The followings are the available model relations:
  * @property UserApp[] $userApps
  */
-class ProxyUser extends User{
+class RouterApiProxyUser extends User{
 
     public static $PHONE_MATCH = "/^13[0-9]{9}$|14[0-9]{9}$|15[0-9]{9}$|18[0-9]{9}$/";
 

@@ -14,7 +14,7 @@ require_once __DIR__ . '/../common/User.php';
  * The followings are the available columns in table 'user':
  * @property string $create_time
  */
-class AdUser extends User
+class RouterAdUser extends User
 {
 
     /**
