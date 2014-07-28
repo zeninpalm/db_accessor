@@ -44,21 +44,6 @@ class Company extends CActiveRecord
 
     public $category_parent;
 
-    public function defaultScope()
-    {
-        if (Yii::app()->user->getIsShopper()) {
-            return array(
-                'condition' => "user_id = :userId",
-                'params' => array(':userId' => Yii::app()->user->getId()),
-            );
-        } else if (Yii::app()->user->getIsAdmin()) {
-            $criteria = new CDbCriteria;
-            $criteria->addInCondition('address_id', Yii::app()->user->getAddressIds());
-            return $criteria;
-        }
-        return array();
-    }
-
     /**
      * @return string the associated database table name
      */
@@ -84,9 +69,7 @@ class Company extends CActiveRecord
             array('contact', 'length', 'max' => 200),
             array('logo', 'length', 'max' => 400),
             array('node', 'length', 'max' => 45,),
-            array('node', 'isRepeatNode'),
             array('home_page', 'length', 'max' => 400),
-            array('address_id', 'isRightAddress'),
             array('address_detail', 'length', 'max' => 100),
             array('logo', 'file', 'types' => 'jpg,png', 'maxSize' => 1024 * 100, 'allowEmpty' => true, 'tooLarge' => '图片大小不能超过100KB'),
             // The following rule is used by search().
@@ -113,22 +96,6 @@ class Company extends CActiveRecord
         );
     }
 
-    public function isRightAddress()
-    {
-        if (count($this->getErrors('address_id')) == 0 && Yii::app()->user->getIsAdmin()) {
-            $addr = Address::model()->findByPk($this->address_id);
-            $result = false;
-            $userAddrId = Yii::app()->user->getUser()->address_id;
-            while ($addr != null && !$result) {
-                $result = ($addr->id == $userAddrId);
-                $addr = $addr->parent;
-            }
-            if (!$result) {
-                $this->addError('address_id', '你只能在区域【' . Yii::app()->user->getUser()->address->name . '】添加商家.');
-            }
-        }
-    }
-
     /**
      * @return array customized attribute labels (name=>label)
      */
@@ -140,8 +107,7 @@ class Company extends CActiveRecord
             'name' => '名称',
             'logo' => '品牌标志',
             'logo_id' => '标志资源ID',
-            'category_parent' => '商家类别【父类】',
-            'category_id' => '商家类别',
+            'category_id' => '商家类型',
             'commercial' => '启动商用',
             'node' => '网关id',
             'stop_sms' => '强制短信验证',
@@ -226,8 +192,8 @@ class Company extends CActiveRecord
     {
         $imgs = $this->getAdImgUrls();
         $result = '';
-        ksort($imgs);
-        $index = 0;
+         ksort($imgs);
+         $index = 0;
         foreach ($imgs as $img) {
             if ($index == (count($imgs) - 1)) {
                 $result = $result . '<img class="last" src="' . $img . '"/>';
@@ -243,100 +209,4 @@ class Company extends CActiveRecord
     {
         return CompanyMember::model()->count('company_id = :company_id', array(':company_id' => $this->id));
     }
-
-    public function getNodes()
-    {
-        $result = array();
-        foreach ($this->routers as $key) {
-            $result[] = $key->node;
-        }
-        return $result;
-    }
-
-    public function isRepeatNode()
-    {
-        if ($this->node != null && strlen($this->node) > 0) {
-            $this->isRepeat('node', $this->node, '网关ID');
-        }
-    }
-
-    private function isRepeat($attr, $value, $msg)
-    {
-        if (count($this->getErrors($attr)) == 0) {
-            $item = Company::model()->findByAttributes(array($attr => $value));
-            if ($item != null && $item->id != $this->id) {
-                $this->addError($attr, $msg . '重复.');
-            }
-        }
-    }
-
-    public function getCommercialStatuse()
-    {
-        switch ($this->commercial) {
-            case 0:
-                return '未启用';
-            case 1:
-                return '正常';
-            case 2:
-                return '取消合作';
-        }
-    }
-
-    public function getCommercialSwitchStatuse()
-    {
-        switch ($this->commercial) {
-            case 0:
-                return '开启';
-            case 1:
-                return '取消合作';
-            case 2:
-                return '开启';
-        }
-    }
-
-    public function getCommercialSatuses()
-    {
-        return array('未安装', '已安装', '取消合作');
-    }
-
-    public function getAddresInfo()
-    {
-        return $this->address->getFullNameInRouter();
-    }
-
-    public function getImg()
-    {
-        $img = CompanyImg::model()->findBySql('select img from company_img where company_id=' . $this->id . ' order by id desc');
-        return $img['img'];
-    }
-
-    public function getRouterStatus()
-    {
-        $output = array();
-        $result = Yii::app()->puppy->nodeStatus($this->node . ',');
-        if ($result['result'] == 'success') {
-            $result = $result['data'];
-            if (isset($result[$this->node])) {
-                $item = $result[$this->node];
-                $output[$this->node] = array('result' => $this->countRouterStatus($item)
-                );
-            } else {
-                $output[$this->node] = array('result' => '获取失败');
-            }
-        } else {
-            $output[$this->node] = array('result' => '获取失败');
-        }
-        return $output[$this->node]['result'];
-    }
-
-    private function countRouterStatus($item)
-    {
-        if ($item['lastHeart'] == null || (time() - $item['lastHeart']) > 86400) {
-            return '失效24小时';
-        } else if ((time() - $item['lastHeart']) > 900) {
-            return '暂时失效';
-        }
-        return '正常';
-    }
-
 }
